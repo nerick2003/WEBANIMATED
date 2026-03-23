@@ -456,6 +456,49 @@ main {
   font-weight: 500;
 }
 
+/* Smooth expand/collapse for the "Selected work" preview area. */
+.work-preview {
+  overflow: hidden;
+  max-height: 0;
+  opacity: 0;
+  transform: translateY(-10px);
+  width: 0;
+  pointer-events: none;
+  transition:
+    max-height 420ms cubic-bezier(0.2, 0.9, 0.2, 1),
+    opacity 260ms ease,
+    transform 420ms cubic-bezier(0.2, 0.9, 0.2, 1),
+    width 420ms cubic-bezier(0.2, 0.9, 0.2, 1);
+}
+
+.work-preview.is-open {
+  max-height: 620px; /* Large enough for image + description + CTA */
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+  width: 100%;
+}
+
+/* Closed state (row layout): keep the preview from becoming the last flex item,
+   otherwise `justify-content: space-between` centers the button. */
+.work-card:not(.flex-col) > .work-preview {
+  order: 1;
+}
+.work-card:not(.flex-col) > button {
+  order: 2;
+}
+
+.work-preview-inner {
+  will-change: transform, opacity;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .work-preview {
+    transition: none;
+    transform: none;
+  }
+}
+
 .contact-block p {
   margin: 0;
   font-size: clamp(1.4rem, 3.6vw, 2.8rem);

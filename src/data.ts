@@ -1,3 +1,6 @@
+import brimsImage from "./assets/BRIMS.png";
+import oldPortfolioImage from "./assets/OLDPORT.png";
+
 /** Used by Contact and can be shared with header / mail links */
 export const CONTACT_EMAIL = "nerickjanio77@gmail.com";
 export const LINKEDIN_URL = "https://www.linkedin.com/";
@@ -22,7 +25,16 @@ export const skills = [
   { name: "Flutter", level: 78 },
 ];
 
-export const projects = [
+export type Project = {
+  title: string;
+  description: string;
+  tech: string[];
+  demo: string;
+  github: string;
+  image?: string;
+};
+
+export const projects: Project[] = [
   {
     title: "Student Task Manager",
     description:
@@ -48,11 +60,21 @@ export const projects = [
     github: "#",
   },
   {
+    title: "BRIMS (Web System)",
+    description:
+      "A role-based barangay resident information system built with Angular + Firebase, including admin/staff dashboards, resident certificate requests, and in-app notifications.",
+    tech: ["Angular", "Firebase", "TypeScript"],
+    demo: "https://brims-2028e.web.app/",
+    github: "#",
+    image: brimsImage,
+  },
+  {
     title: "Portfolio v1",
     description:
       "My first personal website focused on clean UI, responsive behavior, and project storytelling.",
     tech: ["HTML", "CSS", "JavaScript"],
-    demo: "#",
+    demo: "https://nerick2003.github.io/WEB-PORTFOLIO/",
     github: "#",
+    image: oldPortfolioImage,
   },
 ];

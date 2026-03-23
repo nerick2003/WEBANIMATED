@@ -16,6 +16,22 @@ export default function Projects() {
             key={project.title}
             className="project-card section-card group flex h-full flex-col p-6 transition"
           >
+            {project.image ? (
+              <a
+                href={project.demo}
+                target="_blank"
+                rel="noreferrer"
+                aria-label={`${project.title} - Live demo`}
+                className="block"
+              >
+                <img
+                  src={project.image}
+                  alt={`${project.title} preview`}
+                  className="mb-4 aspect-[16/9] w-full rounded-xl border border-slate-700/70 object-cover"
+                  loading="lazy"
+                />
+              </a>
+            ) : null}
             <h3 className="text-xl font-semibold text-white">{project.title}</h3>
             <p className="mt-3 flex-grow text-slate-300">{project.description}</p>
             <div className="mt-4 flex flex-wrap gap-2">

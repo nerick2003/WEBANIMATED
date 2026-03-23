@@ -7,6 +7,11 @@ import About from "./components/About";
 import Contact from "./components/Contact";
 import { IntroOverlay } from "./components/IntroOverlay";
 import { CONTACT_EMAIL } from "./data";
+import brimsImage from "./assets/BRIMS.png";
+import oldPortfolioImage from "./assets/OLDPORT.png";
+import techfixImage from "./assets/TECHFIX.png";
+import pythonLogoImage from "./assets/PYTHON_LOGO.svg";
+import flutterDartLogoImage from "./assets/FLUTTER_DART_LOGO.svg";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -17,9 +22,46 @@ const sections = [
 ];
 
 const workItems = [
-  { title: "Student Task Manager", kind: "Web App" },
-  { title: "Campus Event Portal", kind: "Platform" },
-  { title: "Expense Tracker", kind: "Dashboard" },
+  {
+    title: "BRIMS",
+    kind: "Web System",
+    demo: "https://brims-2028e.web.app/",
+    image: brimsImage,
+    description:
+      "A role-based barangay resident information system built with Angular + Firebase for admin/staff dashboards, resident certificate requests, and in-app notifications.",
+  },
+  {
+    title: "Portfolio v1",
+    kind: "Personal Website",
+    demo: "https://nerick2003.github.io/WEB-PORTFOLIO/",
+    image: oldPortfolioImage,
+    description:
+      "An earlier version of my portfolio showcasing UI design, responsive layout, and selected projects.",
+  },
+  {
+    title: "TechFix Accounting System",
+    kind: "Desktop Accounting App",
+    demo: "https://github.com/nerick2003/TECHFIX.git",
+    image: techfixImage,
+    description:
+      "A desktop accounting practice application with SQLite storage and a Tkinter GUI, implementing double-entry bookkeeping, the full accounting cycle, financial statements, document management, and export tools (Excel/CSV/PDF).",
+  },
+  {
+    title: "Project Nexus POS system",
+    kind: "Point-of-Sale System",
+    demo: "https://github.com/nerick2003/PROJECT-NEXUS.git",
+    image: pythonLogoImage,
+    description:
+      "A Python-based POS system project focused on sales workflow, transaction handling, and inventory-oriented business operations.",
+  },
+  {
+    title: "HabitMate",
+    kind: "Mobile Habit Tracker",
+    demo: "https://github.com/nerick2003/HabitMate.git",
+    image: flutterDartLogoImage,
+    description:
+      "A Flutter habit and routine tracker for Android and iOS with daily checklists, streak tracking, reminders, and progress analytics powered by local storage.",
+  },
 ];
 
 const HERE_LABEL = "YOU ARE HERE";
@@ -49,6 +91,7 @@ export default function App() {
   });
   const [activeSection, setActiveSection] = useState("index");
   const [hoveredSection, setHoveredSection] = useState<string | null>(null);
+  const [openWorkTitle, setOpenWorkTitle] = useState<string | null>(null);
   const [displayEmail, setDisplayEmail] = useState(CONTACT_EMAIL);
   const [displayHereLabel, setDisplayHereLabel] = useState(HERE_LABEL);
   const [isBackToTopHovered, setIsBackToTopHovered] = useState(false);
@@ -90,6 +133,10 @@ export default function App() {
 
   const handleIntroComplete = useCallback(() => {
     setShowIntroOverlay(false);
+  }, []);
+
+  const toggleWorkPreview = useCallback((title: string) => {
+    setOpenWorkTitle((prev) => (prev === title ? null : title));
   }, []);
 
   /** When intro unmounts, play the paused hero timeline once (not while overlay covered the screen) */
@@ -996,12 +1043,65 @@ export default function App() {
               {workItems.map((item, index) => (
                 <article key={item.title} className="work-horizontal-panel">
                   <div className="work-panel-inner">
-                    {index === 0 ? (
+                    {index === 0 && !openWorkTitle ? (
                       <h2 className="work-horizontal-heading">SELECTED WORK</h2>
                     ) : null}
-                    <div className="work-card">
+                    <div
+                      className={
+                        openWorkTitle === item.title
+                          ? "work-card flex-col items-start justify-start gap-3"
+                          : "work-card"
+                      }
+                    >
                       <p>{item.kind}</p>
-                      <h3>{item.title}</h3>
+                      {item.image || item.demo || item.description ? (
+                        <>
+                          <button
+                            type="button"
+                            onClick={() => toggleWorkPreview(item.title)}
+                            aria-expanded={openWorkTitle === item.title}
+                            className="flex items-center gap-2"
+                          >
+                            <h3 className="text-left">{item.title}</h3>
+                            <span aria-hidden className="text-xs text-slate-400">
+                              {openWorkTitle === item.title ? "[-]" : "[+]"}
+                            </span>
+                          </button>
+
+                          <div
+                            className={`work-preview ${openWorkTitle === item.title ? "is-open" : ""}`}
+                            aria-hidden={openWorkTitle !== item.title}
+                          >
+                            <div className="work-preview-inner w-full">
+                              {item.image ? (
+                                <img
+                                  src={item.image}
+                                  alt={`${item.title} preview`}
+                                  loading="lazy"
+                                  className="mb-3 aspect-[16/9] w-full rounded-xl border border-slate-700/70 object-cover"
+                                />
+                              ) : null}
+                              {item.description ? (
+                                <p className="mb-3 text-sm leading-relaxed text-slate-300/90">
+                                  {item.description}
+                                </p>
+                              ) : null}
+                              {item.demo ? (
+                                <a
+                                  href={item.demo}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  className="mt-2 inline-flex w-fit items-center justify-center rounded-lg border border-slate-700 bg-slate-900/40 px-4 py-2 text-sm text-slate-200/90 transition hover:border-sky-500/50 hover:bg-slate-900/60 hover:text-sky-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/60"
+                                >
+                                  Visit site
+                                </a>
+                              ) : null}
+                            </div>
+                          </div>
+                        </>
+                      ) : (
+                        <h3>{item.title}</h3>
+                      )}
                     </div>
                   </div>
                 </article>
