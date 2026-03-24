@@ -4,6 +4,11 @@
 
 :root {
   --bg: #050505;
+  --ghost-shift-y: 0px;
+  --ghost-shift-x: 0px;
+  --ghost-scale: 1;
+  --ghost-row-shift-a: 0px;
+  --ghost-row-shift-b: 0px;
   --text: #f4f4f4;
   --text-strong: rgba(244, 244, 244, 0.9);
   --text-soft: rgba(244, 244, 244, 0.8);
@@ -63,6 +68,49 @@ body {
   -ms-overflow-style: none;
 }
 
+.background-effects {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.bg-ghost-typography {
+  position: absolute;
+  inset: -10% -8%;
+  transform: translate3d(var(--ghost-shift-x), var(--ghost-shift-y), 0) scale(var(--ghost-scale));
+  display: grid;
+  grid-template-rows: repeat(6, minmax(0, 1fr));
+  align-content: center;
+  gap: clamp(0.5rem, 1.2vw, 1rem);
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  filter: blur(0.4px);
+}
+
+.bg-ghost-line {
+  display: block;
+  white-space: nowrap;
+  font-size: clamp(2.8rem, 8.5vw, 8.2rem);
+  line-height: 0.9;
+  color: rgba(148, 163, 184, 0.05);
+  opacity: 0.52;
+}
+
+.bg-ghost-line:nth-child(even) {
+  transform: translateX(calc(-8% + var(--ghost-row-shift-a)));
+}
+
+.bg-ghost-line:nth-child(odd) {
+  transform: translateX(calc(6% + var(--ghost-row-shift-b)));
+}
+
+html[data-theme="light"] .bg-ghost-line {
+  color: rgba(71, 85, 105, 0.06);
+}
+
 /* Beat UA / component cursors (links, buttons, etc.) so only .cursor-dot shows */
 html,
 body,
@@ -76,7 +124,9 @@ body::-webkit-scrollbar {
 
 #root {
   min-height: 100vh;
-  background-color: var(--bg);
+  background-color: transparent;
+  position: relative;
+  z-index: 1;
 }
 
 .portfolio-root {
@@ -492,7 +542,43 @@ main {
   will-change: transform, opacity;
 }
 
+.work-visit-link {
+  border: 1px solid rgba(71, 85, 105, 0.9);
+  background: rgba(15, 23, 42, 0.45);
+  color: rgba(226, 232, 240, 0.92);
+}
+
+.work-visit-link:hover {
+  border-color: rgba(14, 165, 233, 0.5);
+  background: rgba(15, 23, 42, 0.62);
+  color: rgb(125, 211, 252);
+}
+
+.work-visit-link:focus-visible {
+  --tw-ring-color: rgba(56, 189, 248, 0.6);
+}
+
+html[data-theme="light"] .work-visit-link {
+  border-color: #59616e;
+  background: #949ca8;
+  color: #e5e7eb;
+}
+
+html[data-theme="light"] .work-visit-link:hover {
+  border-color: #3f4857;
+  background: #8b93a0;
+  color: #f3f4f6;
+}
+
+html[data-theme="light"] .work-visit-link:focus-visible {
+  --tw-ring-color: rgba(55, 65, 81, 0.45);
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .bg-ghost-typography {
+    transform: none;
+  }
+
   .work-preview {
     transition: none;
     transform: none;
@@ -532,6 +618,7 @@ main {
     gap: 0.75rem;
     flex-wrap: wrap;
     row-gap: 0.5rem;
+    align-items: flex-start;
   }
 
   .site-header-right {
@@ -551,6 +638,8 @@ main {
   }
 
   .site-header nav {
+    flex-direction: column;
+    align-items: flex-end;
     gap: 0.65rem;
     flex-shrink: 0;
   }
@@ -650,19 +739,10 @@ main {
   inset: 0;
   z-index: 10000;
   pointer-events: none;
-  background: transparent;
-  -webkit-backdrop-filter: invert(1);
-  backdrop-filter: invert(1);
+  background: #ffffff;
+  mix-blend-mode: difference;
   clip-path: circle(0% at 50% 50%);
   animation: theme-wipe-expand 1.25s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-}
-
-/* One frame with full-size transparent layer, no invert — matches next paint when overlay is removed */
-.theme-wipe-overlay.theme-wipe-overlay--no-backdrop {
-  -webkit-backdrop-filter: none;
-  backdrop-filter: none;
-  animation: none;
-  clip-path: circle(150% at 50% 50%);
 }
 
 @keyframes theme-wipe-expand {

@@ -280,11 +280,11 @@ export default function Contact({ isThemeWiping = false, onPolaroidHoverChange }
     <section
       ref={sectionRef}
       id="contact"
-      className="flex min-h-screen min-h-[100dvh] w-full flex-col justify-center scroll-mt-16 bg-[var(--bg)] mt-12 py-12 pb-16 font-sans text-[var(--text)] md:mt-16 md:py-16 md:pb-24 lg:mt-20"
+      className="flex min-h-screen min-h-[100dvh] w-full flex-col justify-center scroll-mt-16 bg-[var(--bg)] mt-24 py-24 pb-16 font-sans text-[var(--text)] md:mt-16 md:py-16 md:pb-24 lg:mt-20"
     >
       <div className="mx-auto w-full max-w-6xl px-4 md:px-8">
-        <div className="flex flex-col items-center gap-16 lg:flex-row lg:items-center lg:justify-center lg:gap-44 xl:gap-56 2xl:gap-72">
-          <div className="mt-3 flex shrink-0 -rotate-1 -skew-x-[8deg] flex-col items-center md:mt-4 md:-skew-x-[10deg]">
+        <div className="flex flex-col items-center gap-8 md:gap-16 lg:flex-row lg:items-center lg:justify-center lg:gap-44 xl:gap-56 2xl:gap-72">
+          <div className="mt-0 flex shrink-0 -rotate-1 -skew-x-[8deg] flex-col items-center md:mt-4 md:-skew-x-[10deg]">
             <div
               ref={arrowColumnRef}
               className="flex flex-col items-center gap-6 md:gap-8 will-change-transform"
@@ -319,7 +319,7 @@ export default function Contact({ isThemeWiping = false, onPolaroidHoverChange }
             </div>
           </div>
 
-          <div className="relative mx-auto grid w-full max-w-lg min-h-[min(28rem,72vh)] place-items-center px-4 pt-0 md:px-8 lg:w-auto lg:min-h-[min(32rem,78vh)] lg:shrink-0">
+          <div className="relative mx-auto grid w-full max-w-lg min-h-[min(22rem,58vh)] place-items-center px-2 pt-20 md:min-h-[min(28rem,72vh)] md:px-8 md:pt-0 lg:w-auto lg:min-h-[min(32rem,78vh)] lg:shrink-0">
           {/* Back layer: copy + links — z-10 receives hits wherever the polaroid (z-20) does not */}
           <div
             ref={contactCopyRef}

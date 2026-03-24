@@ -1,4 +1,4 @@
-import type { AnimationEvent, MouseEvent as ReactMouseEvent } from "react";
+import type { MouseEvent as ReactMouseEvent } from "react";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { flushSync } from "react-dom";
 import gsap from "gsap";
@@ -97,8 +97,6 @@ export default function App() {
   const [isBackToTopHovered, setIsBackToTopHovered] = useState(false);
   const [isThemeToggleHovered, setIsThemeToggleHovered] = useState(false);
   const [themeWipeTarget, setThemeWipeTarget] = useState<"light" | "dark" | null>(null);
-  /** Strip invert before unmounting overlay so the compositor never pops invert → normal in one step */
-  const [themeWipeBackdropClear, setThemeWipeBackdropClear] = useState(false);
   const [isIntroTextHovered, setIsIntroTextHovered] = useState(false);
   const [isEmailHovered, setIsEmailHovered] = useState(false);
   const [isPolaroidHovered, setIsPolaroidHovered] = useState(false);
@@ -113,6 +111,7 @@ export default function App() {
   const themeToggleHoverRef = useRef(false);
   const polaroidHoverRef = useRef(false);
   const themeWipeTargetRef = useRef<"light" | "dark" | null>(null);
+  const themeWipeFinishRef = useRef<number | null>(null);
   const emailScrambleRef = useRef<number | null>(null);
   const hereLabelScrambleRef = useRef<number | null>(null);
   const encryptedEmailRef = useRef(CONTACT_EMAIL);
@@ -284,6 +283,7 @@ export default function App() {
 
   useLayoutEffect(() => {
     let removeCursorPointerListener: (() => void) | undefined;
+    let removeGhostMotionListeners: (() => void) | undefined;
     const htmlRootEl = document.documentElement
     const bgBeforeHero =
       getComputedStyle(htmlRootEl).getPropertyValue("--bg").trim() || "#050505"
@@ -345,6 +345,43 @@ export default function App() {
       const prefersReducedMotion = window.matchMedia(
         "(prefers-reduced-motion: reduce)",
       ).matches
+
+      if (!prefersReducedMotion) {
+        const updateGhostMotion = () => {
+          const max = Math.max(
+            1,
+            (document.scrollingElement?.scrollHeight ?? document.documentElement.scrollHeight) -
+              window.innerHeight,
+          );
+          const p = Math.min(1, Math.max(0, window.scrollY / max));
+          const shiftY = p * -46;
+          const shiftX = Math.sin(p * Math.PI * 1.2) * 10;
+          const scale = 1 + p * 0.03;
+          const rowDriftA = Math.sin(p * Math.PI * 2) * 18;
+          const rowDriftB = Math.cos(p * Math.PI * 1.8) * -16;
+          htmlRootEl.style.setProperty("--ghost-shift-y", `${shiftY}px`);
+          htmlRootEl.style.setProperty("--ghost-shift-x", `${shiftX}px`);
+          htmlRootEl.style.setProperty("--ghost-scale", `${scale}`);
+          htmlRootEl.style.setProperty("--ghost-row-shift-a", `${rowDriftA}px`);
+          htmlRootEl.style.setProperty("--ghost-row-shift-b", `${rowDriftB}px`);
+        };
+
+        updateGhostMotion();
+        window.addEventListener("scroll", updateGhostMotion, { passive: true });
+        window.addEventListener("resize", updateGhostMotion);
+        ScrollTrigger.addEventListener("refresh", updateGhostMotion);
+        removeGhostMotionListeners = () => {
+          window.removeEventListener("scroll", updateGhostMotion);
+          window.removeEventListener("resize", updateGhostMotion);
+          ScrollTrigger.removeEventListener("refresh", updateGhostMotion);
+        };
+      } else {
+        htmlRootEl.style.setProperty("--ghost-shift-y", "0px");
+        htmlRootEl.style.setProperty("--ghost-shift-x", "0px");
+        htmlRootEl.style.setProperty("--ghost-scale", "1");
+        htmlRootEl.style.setProperty("--ghost-row-shift-a", "0px");
+        htmlRootEl.style.setProperty("--ghost-row-shift-b", "0px");
+      }
 
       /* Black → page bg reads as “dim” on reload; skip for saved light theme (inline script already set data-theme). */
       const skipDarkBgHeroIntro =
@@ -722,8 +759,18 @@ export default function App() {
       if (hereLabelScrambleRef.current !== null) {
         window.clearInterval(hereLabelScrambleRef.current);
       }
+      if (themeWipeFinishRef.current !== null) {
+        window.clearTimeout(themeWipeFinishRef.current);
+        themeWipeFinishRef.current = null;
+      }
       removeCursorPointerListener?.();
+      removeGhostMotionListeners?.();
       htmlRootEl.style.removeProperty("--bg");
+      htmlRootEl.style.removeProperty("--ghost-shift-y");
+      htmlRootEl.style.removeProperty("--ghost-shift-x");
+      htmlRootEl.style.removeProperty("--ghost-scale");
+      htmlRootEl.style.removeProperty("--ghost-row-shift-a");
+      htmlRootEl.style.removeProperty("--ghost-row-shift-b");
       heroIntroTimelineRef.current = null;
       ctx.revert();
     };
@@ -817,38 +864,42 @@ export default function App() {
       return;
     }
     themeWipeTargetRef.current = next;
-    setThemeWipeBackdropClear(false);
     setThemeWipeTarget(next);
-  };
-
-  const handleThemeWipeEnd = (event: AnimationEvent<HTMLDivElement>) => {
-    if (event.animationName !== "theme-wipe-expand") return;
-    const next = themeWipeTargetRef.current;
-    if (!next) return;
-
-    flushSync(() => {
-      setTheme(next);
-      setThemeWipeBackdropClear(true);
-    });
-
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
+    if (themeWipeFinishRef.current !== null) {
+      window.clearTimeout(themeWipeFinishRef.current);
+    }
+    /* Drive completion in JS for cross-browser reliability (some paths miss animationend). */
+    themeWipeFinishRef.current = window.setTimeout(() => {
+      const pending = themeWipeTargetRef.current;
+      if (!pending) return;
+      flushSync(() => {
+        setTheme(pending);
         themeWipeTargetRef.current = null;
-        setThemeWipeBackdropClear(false);
         setThemeWipeTarget(null);
       });
-    });
+      themeWipeFinishRef.current = null;
+    }, 1500);
   };
 
   return (
     <>
       {themeWipeTarget ? (
         <div
-          className={`theme-wipe-overlay ${themeWipeBackdropClear ? "theme-wipe-overlay--no-backdrop" : ""}`}
-          onAnimationEnd={handleThemeWipeEnd}
+          className="theme-wipe-overlay"
           aria-hidden="true"
         />
       ) : null}
+
+      <div className="background-effects" aria-hidden="true">
+        <div className="bg-ghost-typography">
+          <span className="bg-ghost-line">NRCK NRCK NRCK NRCK NRCK NRCK</span>
+          <span className="bg-ghost-line">NRCK NRCK NRCK NRCK NRCK NRCK</span>
+          <span className="bg-ghost-line">NRCK NRCK NRCK NRCK NRCK NRCK</span>
+          <span className="bg-ghost-line">NRCK NRCK NRCK NRCK NRCK NRCK</span>
+          <span className="bg-ghost-line">NRCK NRCK NRCK NRCK NRCK NRCK</span>
+          <span className="bg-ghost-line">NRCK NRCK NRCK NRCK NRCK NRCK</span>
+        </div>
+      </div>
 
       <div className="portfolio-root" inert={showIntroOverlay ? true : undefined}>
       <div
@@ -1016,10 +1067,10 @@ export default function App() {
               onBlur={() => setIsIntroTextHovered(false)}
             >
               I am Nerick Edward J. Macapayag, a dedicated Information Technology student at
-              the University of Science and Technology of Southern Philippines. I have a strong passion
-              for technology and enjoy building web applications, computer software, and mobile apps. I
-              am also a database enthusiast, constantly improving my skills in data management and
-              system design.
+              the University of Science and Technology of Southern Philippines and a Frontend
+              Developer (with backend experience). I have a strong passion for technology and enjoy
+              building web applications, software, and mobile apps. I am also a database enthusiast,
+              continuously improving my skills in data management and system design.
             </p>
             <p
               className="intro-fade"
@@ -1091,7 +1142,7 @@ export default function App() {
                                   href={item.demo}
                                   target="_blank"
                                   rel="noreferrer"
-                                  className="mt-2 inline-flex w-fit items-center justify-center rounded-lg border border-slate-700 bg-slate-900/40 px-4 py-2 text-sm text-slate-200/90 transition hover:border-sky-500/50 hover:bg-slate-900/60 hover:text-sky-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/60"
+                                  className="work-visit-link mt-2 inline-flex w-fit items-center justify-center rounded-lg px-4 py-2 text-sm transition focus-visible:outline-none focus-visible:ring-2"
                                 >
                                   Visit site
                                 </a>
