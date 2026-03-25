@@ -1114,7 +1114,7 @@ export default function App() {
                             className="flex items-center gap-2"
                           >
                             <h3 className="text-left">{item.title}</h3>
-                            <span aria-hidden className="text-xs text-slate-400">
+                            <span aria-hidden className="text-xs text-[var(--text-dim)]">
                               {openWorkTitle === item.title ? "[-]" : "[+]"}
                             </span>
                           </button>
@@ -1129,11 +1129,11 @@ export default function App() {
                                   src={item.image}
                                   alt={`${item.title} preview`}
                                   loading="lazy"
-                                  className="mb-3 aspect-[16/9] w-full rounded-xl border border-slate-700/70 object-cover"
+                                  className="mb-3 aspect-[16/9] w-full rounded-xl border border-[var(--border)] object-cover"
                                 />
                               ) : null}
                               {item.description ? (
-                                <p className="mb-3 text-sm leading-relaxed text-slate-300/90">
+                                <p className="mb-3 text-sm leading-relaxed text-[var(--text-soft)]">
                                   {item.description}
                                 </p>
                               ) : null}

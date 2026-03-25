@@ -124,7 +124,7 @@ body::-webkit-scrollbar {
 
 #root {
   min-height: 100vh;
-  background-color: transparent;
+  background-color: var(--bg);
   position: relative;
   z-index: 1;
 }
@@ -150,6 +150,12 @@ body::-webkit-scrollbar {
   transform: translate(-50%, -50%);
   will-change: transform;
   transition: width 200ms ease, height 200ms ease, opacity 200ms ease;
+}
+
+/* Light theme: white + difference still inverts cleanly now that #root carries var(--bg). */
+html[data-theme="light"] .cursor-dot {
+  background: #ffffff;
+  mix-blend-mode: difference;
 }
 
 .cursor-dot.is-enlarged {

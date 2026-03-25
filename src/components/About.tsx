@@ -55,13 +55,13 @@ const DATABASES: TechItem[] = [
 ];
 
 const TILE_CLASS =
-  "inline-flex h-11 w-11 items-center justify-center rounded-xl border border-slate-600/90 bg-slate-900/80 text-slate-200 transition hover:border-sky-500/50 hover:text-sky-300 md:h-12 md:w-12";
+  "inline-flex h-11 w-11 items-center justify-center rounded-xl border border-[var(--border)] bg-[var(--surface)] text-[var(--text-soft)] transition hover:border-[var(--line)] hover:text-[var(--text)] md:h-12 md:w-12";
 const ICON_CLASS = "h-6 w-6 shrink-0 fill-current md:h-7 md:w-7";
 
 function TechRow({ label, items }: { label: string; items: TechItem[] }) {
   return (
     <div className="tech-stack-row">
-      <p className="tech-stack-label mb-3 text-center text-[0.65rem] font-medium uppercase tracking-[0.22em] text-slate-500">
+      <p className="tech-stack-label mb-3 text-center text-[0.65rem] font-medium uppercase tracking-[0.22em] text-[var(--text-dim)]">
         {label}
       </p>
       <div className="flex flex-wrap justify-center gap-3 md:gap-4">
