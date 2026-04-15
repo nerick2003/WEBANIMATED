@@ -3,7 +3,7 @@ import oldPortfolioImage from "./assets/OLDPORT.png";
 
 /** Used by Contact and can be shared with header / mail links */
 export const CONTACT_EMAIL = "nerickjanio77@gmail.com";
-export const LINKEDIN_URL = "https://www.linkedin.com/";
+export const LINKEDIN_URL = "https://www.linkedin.com/in/nerick-edward-macapayag-b72922381";
 
 export const navItems = [
   { label: "Home", id: "hero" },

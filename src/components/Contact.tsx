@@ -54,6 +54,7 @@ export default function Contact({ isThemeWiping = false, onPolaroidHoverChange }
   const [offset, setOffset] = useState({ x: 0, y: 0 });
   const offsetRef = useRef({ x: 0, y: 0 });
   const drag = useRef({ active: false, startX: 0, startY: 0, originX: 0, originY: 0 });
+  const emailComposeUrl = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent("Portfolio Inquiry")}`;
 
   const onPointerDown = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -334,7 +335,7 @@ export default function Contact({ isThemeWiping = false, onPolaroidHoverChange }
             <div className="flex justify-center pt-1">
               <span className="inline-flex max-w-full flex-wrap items-center justify-center gap-1.5 text-[0.65rem] font-semibold uppercase not-italic leading-tight tracking-[0.1em] text-[var(--text)] sm:gap-2 sm:text-xs md:gap-3 md:text-sm">
                 <a
-                  href={`mailto:${CONTACT_EMAIL}`}
+                  href={emailComposeUrl}
                   aria-label={`Send email to ${CONTACT_EMAIL}`}
                   className="inline-flex min-h-[44px] min-w-[44px] cursor-pointer items-center justify-center border-b border-[var(--text)] pb-px transition-colors hover:text-[var(--text-muted)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--text)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]"
                 >
